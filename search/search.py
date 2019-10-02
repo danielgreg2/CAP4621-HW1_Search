@@ -94,8 +94,7 @@ def depthFirstSearch(problem):
     Start's successors are (5,4) and (4,5); this returns a list of length 2;
 		each list tuple hold position, direction to go, and stepcost
 	"""
-
-	"*** YOUR CODE HERE ***"
+	
 	#Pseduocode for DFS: https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/tutorial/
 	#More pseudocode that explains where to mark node as visited: https://www.tutorialspoint.com/data_structures_algorithms/depth_first_traversal.htm
 	
@@ -104,7 +103,6 @@ def depthFirstSearch(problem):
 	#create stack that will hold the position we want to go to, and a list of the directions we have to take to get to that position (stores it as a tuple)
 	stack = util.Stack()
 	stack.push((problem.getStartState(), []))
-	
 	
 	#DFS Iterative Portion
 	while not stack.isEmpty():
@@ -121,9 +119,38 @@ def depthFirstSearch(problem):
 				stack.push((x[0], directions + [x[1]]))
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""Search the shallowest nodes in the search tree first."""
+	'''
+	BFS pseudocode (from COP3530 lecture)
+	Take an arbitrary start vertex, mark it identified (color it gray), and place it in a queue.
+	while the queue is not empty
+		Take a vertex, u, out of the queue and visit u.
+		for all vertices, v, adjacent to this vertex, u 
+			if v has not been identified or visited
+				Mark it identified (color it grey)
+				Insert vertex v into the queue.
+			We are now finished visiting u (color it purple).
+	'''
+	
+	#visitedPos is a set containing all the positions on the board that have been visited
+	visitedPos = set()
+	#identifiedPos is a set containing all the positions on the board that have been identified
+	identifiedPos = set()
+	#create queue that will hold the position we want to go to, and a list of the directions we have to take to get to that position (stores it as a tuple)
+	queue = util.Queue()
+	queue.push((problem.getStartState(), []))
+	
+	identifiedPos.add(problem.getStartState())
+	#BFS Iterative Portion
+	while not queue.isEmpty():
+		pos, directions = queue.pop()
+		visitedPos.add(pos)
+		if problem.isGoalState(pos):
+			return directions
+		for x in problem.getSuccessors(pos):
+			if (x[0] not in visitedPos) and (x[0] not in identifiedPos):
+				identifiedPos.add(x[0])
+				queue.push((x[0], directions + [x[1]]))
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
