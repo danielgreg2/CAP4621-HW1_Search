@@ -73,7 +73,7 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
+	"""
     Search the deepest nodes in the search tree first.
 
     Your search algorithm needs to return a list of actions that reaches the
@@ -85,9 +85,40 @@ def depthFirstSearch(problem):
     print "Start:", problem.getStartState()
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""
+    
+	"""
+    Notes:
+    The start coordinate is (5,5).
+    The start is not a goal.
+    Start's successors are (5,4) and (4,5); this returns a list of length 2;
+		each list tuple hold position, direction to go, and stepcost
+	"""
+
+	"*** YOUR CODE HERE ***"
+	#Pseduocode for DFS: https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/tutorial/
+	#More pseudocode that explains where to mark node as visited: https://www.tutorialspoint.com/data_structures_algorithms/depth_first_traversal.htm
+	
+	#visitedPos is a set containing all the positions on the board that have been visited
+	visitedPos = set()
+	#create stack that will hold the position we want to go to, and a list of the directions we have to take to get to that position (stores it as a tuple)
+	stack = util.Stack()
+	stack.push((problem.getStartState(), []))
+	
+	
+	#DFS Iterative Portion
+	while not stack.isEmpty():
+		#pop from stack the next position to visit AND directions to that position
+		pos, directions = stack.pop()
+		#mark that we have visited that position so we don't visit it again
+		visitedPos.add(pos)
+		#check if we have reached the goal state, return directions to the goal state when we get to it
+		if problem.isGoalState(pos):
+			return directions
+		#push all neighbors (and directions to neighbors) of the position (that are not visited) onto the stack
+		for x in problem.getSuccessors(pos):
+			if x[0] not in visitedPos:
+				stack.push((x[0], directions + [x[1]]))
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
