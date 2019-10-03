@@ -360,8 +360,8 @@ class CornersProblem(search.SearchProblem):
                 successors.append(successor)
 
         self._expanded += 1 # DO NOT CHANGE
-        print successors
-        print "\n"
+        #print successors
+        #print "\n"
         return successors
 
     def getCostOfActions(self, actions):

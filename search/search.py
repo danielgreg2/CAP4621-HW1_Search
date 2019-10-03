@@ -226,25 +226,27 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 	total cost saved as (so that we can use it if we back track).
 	'''
     
-	#visitedPos is a set containing all the positions on the board that have been visited
-	visitedPos = set()
-	#identifiedPos is a set containing all the positions on the board that have been identified
-	identifiedPos = set()
+	#visitedPos is a list containing all the positions on the board that have been visited
+	visitedPos = []
+	#identifiedPos is a list containing all the positions on the board that have been identified
+	identifiedPos = []
 	#create priority queue that will hold the position we want to go to, a list of the directions we have to take to get to that position, and the cost to get to that position (total cost to get to the position)
 	#the 'priority' of this queue is based on the 'manhattanHeuristic' in searchAgents.py
 	priorityQueue = util.PriorityQueue()
-	priorityQueue.push((problem.getStartState(), [], 0), 0)
 	
-	identifiedPos.add(problem.getStartState())
+	initialPosition = problem.getStartState()
+	
+	priorityQueue.push((initialPosition, [], 0), 0)
+	identifiedPos.append(initialPosition)
 	#A* Iterative Portion
 	while not priorityQueue.isEmpty():
 		pos, directions, cost = priorityQueue.pop()
-		visitedPos.add(pos)
+		visitedPos.append(pos)
 		if problem.isGoalState(pos):
 			return directions
 		for x in problem.getSuccessors(pos):
 			if (x[0] not in visitedPos) and (x[0] not in identifiedPos):
-				identifiedPos.add(x[0])
+				identifiedPos.append(x[0])
 				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), heuristic(x[0], problem) + cost + x[2])
 			if problem.isGoalState(x[0]):
 				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), heuristic(x[0], problem) + cost + x[2])
