@@ -153,9 +153,55 @@ def breadthFirstSearch(problem):
 				queue.push((x[0], directions + [x[1]]))
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""Search the node of least total cost first."""
+	
+	'''
+	Pseudocode can be found here: https://www.geeksforgeeks.org/uniform-cost-search-dijkstra-for-large-graphs/
+	In essence, choose a start vertex
+	Look at adjacent states, choose to go to the state with the lowest cost,
+	repeat this process until the goal state is reached
+	(Kind of like BFS, but going to the least total path cost, instead of visiting every breadth node)
+	'''
+	'''
+	Pseudocode from Wikipedia: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Practical_optimizations_and_infinite_graphs
+	procedure UniformCostSearch(Graph, start, goal)
+		node <- start
+		cost <- 0
+		frontier <- priority queue containing node only
+		explored <- empty set
+		do
+			if frontier is empty
+				return failure
+			node <- frontier.pop()
+			if node is goal
+				return solution
+			explored.add(node)
+			for each of node's neighbors n
+				if n is not in explored
+					frontier.add(n)
+	'''
+	
+	#visitedPos is a set containing all the positions on the board that have been visited
+	visitedPos = set()
+	#identifiedPos is a set containing all the positions on the board that have been identified
+	identifiedPos = set()
+	#create priority queue that will hold the position we want to go to, a list of the directions we have to take to get to that position, and the cost to get to that position (total cost to get to the position)
+	priorityQueue = util.PriorityQueue()
+	priorityQueue.push((problem.getStartState(), [], 0), 0)
+	
+	identifiedPos.add(problem.getStartState())
+	#UCS Iterative Portion
+	while not priorityQueue.isEmpty():
+		pos, directions, cost = priorityQueue.pop()
+		visitedPos.add(pos)
+		if problem.isGoalState(pos):
+			return directions
+		for x in problem.getSuccessors(pos):
+			if (x[0] not in visitedPos) and (x[0] not in identifiedPos):
+				identifiedPos.add(x[0])
+				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), cost + x[2])
+			if problem.isGoalState(x[0]):
+				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), cost + x[2])
 
 def nullHeuristic(state, problem=None):
     """
