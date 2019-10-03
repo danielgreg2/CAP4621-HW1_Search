@@ -518,25 +518,65 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    #Note to self, Manhattan and Euclidean distance to food fail admissibility tests (probably due to walls)
+    #Note to self, I cannot get mazeDistance to work
+    
+    #This website: https://adrianyi.com/2017/08/PacmanMaze.html proivdes ideas for foodSearchProblem heuristics
+    #I already found out sum of distances to all remaining goals is inadmissible
+    
+    #average manhattan distance to all remaining goals expands 14605 nodes
+    #average euclidean distance to all remaining goals expands 14214 nodes
+    
+    #avergae manhattan distance to n=5 reamining goals expands 14483 nodes
+    #avergae euclidean distance to n=5 reamining goals expands 14116 nodes
+    #avergae manhattan distance to n=3 reamining goals expands 14512 nodes
+    #avergae euclidean distance to n=3 reamining goals expands 14225 nodes
+    
+    #manhattan distance to closest reamaining goal expands 13898 nodes
+    #euclidean distance to closest reamaining goal expands 14191 nodes
+    
+    #minimum connected path length to all remaining goals
+    
+    import math         #needed for n remaining goals heuristics
+    
+    '''
+    def mazeDist(point1, point2, prob):
+        x1, y1 = point1
+        x2, y2 = point2
+        walls = prob.walls
+        assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
+        assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
+        #prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
+        prob.startState = point1
+        #prob.goal = point2
+        return len(search.bfs(prob))
+    '''
+    
+    '''
+    def euclideanDist(point1, point2):
+        return ( (point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2 ) ** 0.5
+    '''
+        
     position, foodGrid = state
     
     foodPositions = foodGrid.asList() # These are the positions of the food
     #print foodPositions
     
-    heurisitcCost = 0
-    #'''
+    heuristicCost = 0
+    
+    if len(foodPositions) == 0:
+        return 0
+    '''
     #This very simple heurisitc returns 0 if we are at the goal state (i.e. no food left), or 
     #the amount of food left if we are not at the goal state
     
-    #This heuristic is admissible and consistent, but not very good (receives 2/4)
-    if len(foodPositions) == 0:
-        return 0
-        
+    #This heuristic is admissible and consistent, and somewhat good (receives 2/4), expands 12517 nodes
+    
     if (len(foodPositions) > 0):
         return len(foodPositions)
     else:
         return 0
-    #'''
+    '''
     
     '''
     #This very simple heurisitc returns 0 if we are at the goal state (i.e. no food left), or 1 if
@@ -551,23 +591,110 @@ def foodHeuristic(state, problem):
     '''
     
     '''
+    #Average distance to all remaining goals
+    
     while len(foodPositions) > 0:
         #Find the nearest food
         nearestFood = foodPositions[0]
+        #print nearestFood
+        nearestFoodDistance = euclideanDist(position, nearestFood)
+        #print nearestFoodDistance
+        if len(foodPositions) > 1:
+            for uf in foodPositions:
+                tempDistance = euclideanDist(position, uf)
+                if tempDistance < nearestFoodDistance:
+                    nearestFood = uf
+                    nearestFoodDistance = tempDistance
+        #Add distance to this corner to the heuristic's total cost
+        heuristicCost = heuristicCost + nearestFoodDistance
+        #Take the corner we just computed out of the unvisited corners list (since we don't want to comput distance to it again)
+        foodPositions.remove(nearestFood)
+        #The new position we compute from is the corner we just visited
+        position = nearestFood
+    return math.ceil(heuristicCost / len(foodGrid.asList()))
+    '''
+    
+    '''
+    #Average distance to n remaining goals
+    
+    if len(foodPositions) > 5:
+        n = 5
+    else:
+        n = len(foodPositions)
+    count = 0
+    
+    while len(foodPositions) > 0:
+        #Find the nearest food
+        nearestFood = foodPositions[0]
+        #print nearestFood
+        nearestFoodDistance = euclideanDist(position, nearestFood)
+        #print nearestFoodDistance
+        if len(foodPositions) > 1:
+            for uf in foodPositions:
+                tempDistance = euclideanDist(position, uf)
+                if tempDistance < nearestFoodDistance:
+                    nearestFood = uf
+                    nearestFoodDistance = tempDistance
+        if count < n:
+            #Add distance to this corner to the heuristic's total cost
+            heuristicCost = heuristicCost + nearestFoodDistance
+        count = count + 1
+        #Take the corner we just computed out of the unvisited corners list (since we don't want to comput distance to it again)
+        foodPositions.remove(nearestFood)
+        #The new position we compute from is the corner we just visited
+        position = nearestFood
+    return math.ceil(heuristicCost / n)
+    '''
+    
+    '''
+    #Distance to closest remaining goal
+    
+    while len(foodPositions) > 0:
+        #Find the nearest food
+        nearestFood = foodPositions[0]
+        #print nearestFood
         nearestFoodDistance = util.manhattanDistance(position, nearestFood)
+        #print nearestFoodDistance
         if len(foodPositions) > 1:
             for uf in foodPositions:
                 tempDistance = util.manhattanDistance(position, uf)
                 if tempDistance < nearestFoodDistance:
                     nearestFood = uf
                     nearestFoodDistance = tempDistance
-        #Add distance to this corner to the heuristic's total cost
-        heurisitcCost = heurisitcCost + nearestFoodDistance
-        #Take the corner we just computed out of the unvisited corners list (since we don't want to comput distance to it again)
-        foodPositions.remove(nearestFood)
-        #The new position we compute from is the corner we just visited
-        position = nearestFood
+        return nearestFoodDistance
     '''
+    
+    '''
+    #Minimum connected path between all remaining goals
+    
+    while len(foodPositions) > 0:
+        for food1 in foodPositions:
+            for food2 in foodPositions:
+                if not food1 == food2:
+                    heuristicCost = heuristicCost + util.manhattanDistance(food1, food2)
+        
+        return heuristicCost
+    '''
+    
+    #'''
+    #Distance to farthest remaining goal is best, expands 9444 nodes
+    
+    while len(foodPositions) > 0:
+        #Find the farthest food
+        farthestFood = foodPositions[0]
+        #print nearestFood
+        farthestFoodDistance = util.manhattanDistance(position, farthestFood)
+        #print nearestFoodDistance
+        if len(foodPositions) > 1:
+            for uf in foodPositions:
+                tempDistance = util.manhattanDistance(position, uf)
+                if tempDistance > farthestFoodDistance:
+                    farthestFood = uf
+                    farthestFoodDistance = tempDistance
+        return farthestFoodDistance
+    #'''
+
+    
     
 
 class ClosestDotSearchAgent(SearchAgent):
