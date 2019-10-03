@@ -414,7 +414,7 @@ def cornersHeuristic(state, problem):
         nearestCorner = unvisitedCorners[0]
         nearestCornerDistance = util.manhattanDistance(pos, nearestCorner)
         if len(unvisitedCorners) > 1:
-            for uc in unvisitedCorners:
+            for uc in unvisitedCorners:         #uc stands for "unvisited corner"
                 tempDistance = util.manhattanDistance(pos, uc)
                 if tempDistance < nearestCornerDistance:
                     nearestCorner = uc
@@ -519,8 +519,56 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    
+    foodPositions = foodGrid.asList() # These are the positions of the food
+    #print foodPositions
+    
+    heurisitcCost = 0
+    #'''
+    #This very simple heurisitc returns 0 if we are at the goal state (i.e. no food left), or 
+    #the amount of food left if we are not at the goal state
+    
+    #This heuristic is admissible and consistent, but not very good (receives 2/4)
+    if len(foodPositions) == 0:
+        return 0
+        
+    if (len(foodPositions) > 0):
+        return len(foodPositions)
+    else:
+        return 0
+    #'''
+    
+    '''
+    #This very simple heurisitc returns 0 if we are at the goal state (i.e. no food left), or 1 if
+    #we are not at the goal state
+    
+    #This heuristic is admissible and consistent, but not very good (receives 1/4)
+    
+    if (len(foodPositions) > 0):
+        return 1
+    else:
+        return 0
+    '''
+    
+    '''
+    while len(foodPositions) > 0:
+        #Find the nearest food
+        nearestFood = foodPositions[0]
+        nearestFoodDistance = util.manhattanDistance(position, nearestFood)
+        if len(foodPositions) > 1:
+            for uf in foodPositions:
+                tempDistance = util.manhattanDistance(position, uf)
+                if tempDistance < nearestFoodDistance:
+                    nearestFood = uf
+                    nearestFoodDistance = tempDistance
+        #Add distance to this corner to the heuristic's total cost
+        heurisitcCost = heurisitcCost + nearestFoodDistance
+        #Take the corner we just computed out of the unvisited corners list (since we don't want to comput distance to it again)
+        foodPositions.remove(nearestFood)
+        #The new position we compute from is the corner we just visited
+        position = nearestFood
+    '''
+    
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -549,9 +597,11 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        #Pick our A* search to use the "AnyFoodSearchProblem"
+        return search.aStarSearch(problem)      
+            #Our path cost is 350.
+            #It looks like we initially skip over some food near the beginning, and then never get it at an optimal time, causing the searcht to be sub-optimal
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -585,9 +635,19 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
+        #A goal state is any position with food
+        
+        #definition of function from pacman.py, class GameState, which is defined in our init
+        '''
+        Returns a Grid of boolean food indicator variables.
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        Grids can be accessed via list notation, so to check
+        if there is food at (x,y), just call
+
+        currentFood = state.getFood()
+        if currentFood[x][y] == True: ...
+        '''
+        return self.food[x][y]
 
 def mazeDistance(point1, point2, gameState):
     """
