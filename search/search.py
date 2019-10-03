@@ -132,24 +132,26 @@ def breadthFirstSearch(problem):
 			We are now finished visiting u (color it purple).
 	'''
 	
-	#visitedPos is a set containing all the positions on the board that have been visited
-	visitedPos = set()
-	#identifiedPos is a set containing all the positions on the board that have been identified
-	identifiedPos = set()
+	#visitedPos is a list containing all the positions on the board that have been visited
+	visitedPos = []
+	#identifiedPos is a list containing all the positions on the board that have been identified
+	identifiedPos = []
 	#create queue that will hold the position we want to go to, and a list of the directions we have to take to get to that position (stores it as a tuple)
 	queue = util.Queue()
-	queue.push((problem.getStartState(), []))
-	
-	identifiedPos.add(problem.getStartState())
+
+	initialPosition = problem.getStartState()
+	queue.push((initialPosition, []))
+
+	identifiedPos.append(initialPosition)
 	#BFS Iterative Portion
 	while not queue.isEmpty():
 		pos, directions = queue.pop()
-		visitedPos.add(pos)
+		visitedPos.append(pos)
 		if problem.isGoalState(pos):
 			return directions
 		for x in problem.getSuccessors(pos):
 			if (x[0] not in visitedPos) and (x[0] not in identifiedPos):
-				identifiedPos.add(x[0])
+				identifiedPos.append(x[0])
 				queue.push((x[0], directions + [x[1]]))
 
 def uniformCostSearch(problem):
