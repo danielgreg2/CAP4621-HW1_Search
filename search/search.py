@@ -180,6 +180,10 @@ def uniformCostSearch(problem):
 				if n is not in explored
 					frontier.add(n)
 	'''
+	'''
+	Pseudocode that helped clear up if I should be using total cost or cost short-term cost:
+	https://algorithmicthoughts.wordpress.com/2012/12/15/artificial-intelligence-uniform-cost-searchucs/
+	'''
 	
 	#visitedPos is a set containing all the positions on the board that have been visited
 	visitedPos = set()
@@ -211,9 +215,37 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	"""Search the node that has the lowest combined cost and heuristic first."""\
+    
+	'''
+	This will be pretty much the same as our UCS algorithm, but instead of our priority in the 
+	queue being the total cost to get somewhere, now it will be our A* heuristic + total path cost.
+	Therefore the priority = a heuristic + the total path cost, but we make sure to keep the
+	total cost saved as (so that we can use it if we back track).
+	'''
+    
+	#visitedPos is a set containing all the positions on the board that have been visited
+	visitedPos = set()
+	#identifiedPos is a set containing all the positions on the board that have been identified
+	identifiedPos = set()
+	#create priority queue that will hold the position we want to go to, a list of the directions we have to take to get to that position, and the cost to get to that position (total cost to get to the position)
+	#the 'priority' of this queue is based on the 'manhattanHeuristic' in searchAgents.py
+	priorityQueue = util.PriorityQueue()
+	priorityQueue.push((problem.getStartState(), [], 0), 0)
+	
+	identifiedPos.add(problem.getStartState())
+	#A* Iterative Portion
+	while not priorityQueue.isEmpty():
+		pos, directions, cost = priorityQueue.pop()
+		visitedPos.add(pos)
+		if problem.isGoalState(pos):
+			return directions
+		for x in problem.getSuccessors(pos):
+			if (x[0] not in visitedPos) and (x[0] not in identifiedPos):
+				identifiedPos.add(x[0])
+				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), heuristic(x[0], problem) + cost + x[2])
+			if problem.isGoalState(x[0]):
+				priorityQueue.push((x[0], directions + [x[1]], cost + x[2]), heuristic(x[0], problem) + cost + x[2])
 
 
 # Abbreviations
